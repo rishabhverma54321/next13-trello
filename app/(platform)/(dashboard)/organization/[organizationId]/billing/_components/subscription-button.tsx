@@ -32,7 +32,7 @@ export const SubscriptionButton = ({
       proModal.onOpen();
     }
   }
-
+ 
   return (
     <Button
       variant="primary"
