@@ -10,7 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.26.2",
+    "@clerk/nextjs": "4.29.7",
     "@hello-pangea/dnd": "^16.3.0",
     "@prisma/client": "^5.5.2",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -30,9 +30,9 @@
     "next": "14.0.1",
     "react": "^18",
     "react-dom": "^18",
-    "sonner": "^1.2.0",
+    "sonner": "^1.4.0",
     "stripe": "^14.4.0",
-    "tailwind-merge": "^2.0.0",
+    "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "unsplash-js": "^7.0.18",
     "usehooks-ts": "^2.9.1",

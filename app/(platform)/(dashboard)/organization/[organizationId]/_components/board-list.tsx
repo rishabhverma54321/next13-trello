@@ -59,6 +59,7 @@ export const BoardList = async () => {
             <span className="text-xs">
               {isPro ? "Unlimited" : `${MAX_FREE_BOARDS - availableCount} remaining`}
             </span>
+            {!isPro ? 
             <Hint
               sideOffset={40}
               description={`
@@ -68,7 +69,9 @@ export const BoardList = async () => {
               <HelpCircle
                 className="absolute bottom-2 right-2 h-[14px] w-[14px]"
               />
-            </Hint>
+            </Hint>:
+            <></>
+            }
           </div>
         </FormPopover>
       </div>

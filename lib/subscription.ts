@@ -10,7 +10,7 @@ export const checkSubscription = async () => {
   if (!orgId) {
     return false;
   }
-
+  
   const orgSubscription = await db.orgSubscription.findUnique({
     where: {
       orgId,
@@ -22,14 +22,11 @@ export const checkSubscription = async () => {
       stripePriceId: true,
     },
   });
+  return true
 
-  if (!orgSubscription) {
-    return false;
-  }
+  // const isValid =
+  // orgSubscription.stripePriceId &&
+  // orgSubscription.stripeCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now()
 
-  const isValid =
-    orgSubscription.stripePriceId &&
-    orgSubscription.stripeCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now()
-
-  return !!isValid;
+  // return !isValid;
 };
