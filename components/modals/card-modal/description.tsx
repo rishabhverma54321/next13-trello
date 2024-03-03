@@ -17,10 +17,12 @@ import { Button } from "@/components/ui/button";
 
 interface DescriptionProps {
   data: CardWithList;
+  getAuditLogs: () => void;
 };
 
 export const Description = ({
-  data
+  data,
+  getAuditLogs
 }: DescriptionProps) => {
   const params = useParams();
   const queryClient = useQueryClient();
@@ -55,9 +57,7 @@ export const Description = ({
       queryClient.invalidateQueries({
         queryKey: ["card", data.id],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["card-logs", data.id]
-      });
+      getAuditLogs();
       toast.success(`Card "${data.title}" updated`);
       disableEditing();
     },

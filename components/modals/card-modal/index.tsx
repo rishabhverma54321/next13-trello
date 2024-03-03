@@ -12,21 +12,59 @@ import { Header } from "./header";
 import { Description } from "./description";
 import { Actions } from "./actions";
 import { Activity } from "./activity";
+import { useEffect, useState } from "react";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
   const isOpen = useCardModal((state) => state.isOpen);
   const onClose = useCardModal((state) => state.onClose);
+  const [timer, setTimer] = useState(true)
+  const [fetchLogs, setFetchLogs] = useState(false)
+  const [latestLogDate, setLatestLogDate] = useState(new Date());
 
+  const getAuditLogs = () =>{
+    setFetchLogs(true);
+    setTimer(true);
+    setLatestLogDate(new Date());
+  }
+
+  const setDefault = () =>{
+    setTimer(false);
+    setFetchLogs(false)
+    setLatestLogDate(new Date());
+  }
+  
   const { data: cardData } = useQuery<CardWithList>({
     queryKey: ["card", id],
     queryFn: () => fetcher(`/api/cards/${id}`),
+    enabled: isOpen,
   });
 
-  const { data: auditLogsData } = useQuery<AuditLog[]>({
+  const { data: auditLogsData, isLoading } = useQuery<AuditLog[]>({
     queryKey: ["card-logs", id],
     queryFn: () => fetcher(`/api/cards/${id}/logs`),
+    enabled: isOpen || fetchLogs,
+    refetchInterval: timer ? 1000 :false
   });
+
+  useEffect(() => {
+    let handleTimeout: NodeJS.Timeout;
+    if(isOpen && timer && auditLogsData){
+      const currentLogDate = auditLogsData && auditLogsData[0]?.updatedAt ? new Date(auditLogsData[0].updatedAt) : new Date(latestLogDate);
+      if ( currentLogDate <= latestLogDate) {
+        handleTimeout = setTimeout(setDefault, 3000);
+      }else{
+        setDefault();
+      }
+    }
+    
+    return () => {
+      clearTimeout(handleTimeout);
+      !isOpen && setTimer(true);
+      !isOpen && setFetchLogs(false)
+    } // Cleanup timeout
+  }, [timer, isOpen, auditLogsData]);
+
 
   return (
     <Dialog
@@ -36,14 +74,14 @@ export const CardModal = () => {
       <DialogContent>
         {!cardData
           ? <Header.Skeleton />
-          : <Header data={cardData} />
+          : <Header data={cardData} getAuditLogs={getAuditLogs}/>
         }
         <div className="grid grid-cols-1 md:grid-cols-4 md:gap-4">
           <div className="col-span-3">
             <div className="w-full space-y-6">
               {!cardData
                 ? <Description.Skeleton />
-                : <Description data={cardData} />
+                : <Description data={cardData} getAuditLogs={getAuditLogs}/>
               }
               {!auditLogsData
                 ? <Activity.Skeleton />

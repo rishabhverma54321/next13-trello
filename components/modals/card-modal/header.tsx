@@ -14,10 +14,12 @@ import { FormInput } from "@/components/form/form-input";
 
 interface HeaderProps {
   data: CardWithList;
+  getAuditLogs: () => void;
 }
 
 export const Header = ({
   data,
+  getAuditLogs
 }: HeaderProps) => {
   const queryClient = useQueryClient();
   const params = useParams();
@@ -28,10 +30,7 @@ export const Header = ({
         queryKey: ["card", data.id]
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["card-logs", data.id]
-      });
-
+      getAuditLogs();
       toast.success(`Renamed to "${data.title}"`);
       setTitle(data.title);
     },

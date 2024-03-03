@@ -55,7 +55,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
     });
 
-    await createAuditLog({
+    createAuditLog({
       entityId: card.id,
       entityTitle: card.title,
       entityType: ENTITY_TYPE.CARD,
