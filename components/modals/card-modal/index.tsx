@@ -44,7 +44,7 @@ export const CardModal = () => {
     queryKey: ["card-logs", id],
     queryFn: () => fetcher(`/api/cards/${id}/logs`),
     enabled: isOpen || fetchLogs,
-    refetchInterval: timer ? 1000 :false
+    refetchInterval: timer ? 2000 :false
   });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const CardModal = () => {
     if(isOpen && timer && auditLogsData){
       const currentLogDate = auditLogsData && auditLogsData[0]?.updatedAt ? new Date(auditLogsData[0].updatedAt) : new Date(latestLogDate);
       if ( currentLogDate <= latestLogDate) {
-        handleTimeout = setTimeout(setDefault, 3000);
+        handleTimeout = setTimeout(setDefault, 6000);
       }else{
         setDefault();
       }
@@ -63,7 +63,7 @@ export const CardModal = () => {
       !isOpen && setTimer(true);
       !isOpen && setFetchLogs(false)
     } // Cleanup timeout
-  }, [timer, isOpen, auditLogsData]);
+  }, [timer, isOpen,fetchLogs, auditLogsData]);
 
 
   return (

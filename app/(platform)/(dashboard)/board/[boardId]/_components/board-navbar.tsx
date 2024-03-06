@@ -7,7 +7,7 @@ interface BoardNavbarProps {
   data: Board;
 };
 
-export const BoardNavbar = async ({
+export const BoardNavbar = ({
   data
 }: BoardNavbarProps) => {
   return (
