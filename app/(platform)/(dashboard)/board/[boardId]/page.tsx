@@ -17,18 +17,22 @@ const BoardIdPage = ({ params }: BoardIdPageProps) => {
 
   const { execute, data } = useAction(getList);
 
+  const boardUpdate = () => {
+    execute({
+      boardId: params.boardId,
+    });
+  };
+
   useEffect(() => {
     if (!isOpen) {
-      execute({
-        boardId: params.boardId,
-      });
+      boardUpdate();
     }
   }, [isOpen]);
 
   if (data) {
     return (
       <div className="p-4 h-full overflow-x-auto">
-        <ListContainer boardId={params.boardId} data={data} />
+        <ListContainer boardId={params.boardId} data={data} boardUpdate={boardUpdate} />
       </div>
     );
   }

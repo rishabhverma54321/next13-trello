@@ -22,6 +22,7 @@ interface CardFormProps {
   enableEditing: () => void;
   disableEditing: () => void;
   isEditing: boolean;
+  boardUpdate: () => void;
 };
 
 export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(({
@@ -29,6 +30,7 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(({
   enableEditing,
   disableEditing,
   isEditing,
+  boardUpdate
 }, ref) => {
   const params = useParams();
   const formRef = useRef<ElementRef<"form">>(null);
@@ -37,6 +39,7 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(({
     onSuccess: (data) => {
       toast.success(`Card "${data.title}" created`);
       formRef.current?.reset();
+      boardUpdate();
     },
     onError: (error) => {
       toast.error(error);

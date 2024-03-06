@@ -13,11 +13,13 @@ import { ListHeader } from "./list-header";
 interface ListItemProps {
   data: ListWithCards;
   index: number;
+  boardUpdate: ()=> void;
 };
 
 export const ListItem = ({
   data,
   index,
+  boardUpdate
 }: ListItemProps) => {
   const textareaRef = useRef<ElementRef<"textarea">>(null);
 
@@ -49,6 +51,7 @@ export const ListItem = ({
             <ListHeader 
               onAddCard={enableEditing}
               data={data}
+              boardUpdate={boardUpdate}
             />
             <Droppable droppableId={data.id} type="card">
               {(provided) => (
@@ -77,6 +80,7 @@ export const ListItem = ({
               isEditing={isEditing}
               enableEditing={enableEditing}
               disableEditing={disableEditing}
+              boardUpdate={boardUpdate}
             />
           </div>
         </li>

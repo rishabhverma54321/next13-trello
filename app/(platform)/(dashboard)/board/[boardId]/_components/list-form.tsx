@@ -14,7 +14,7 @@ import { FormSubmit } from "@/components/form/form-submit";
 
 import { ListWrapper } from "./list-wrapper";
 
-export const ListForm = () => {
+export const ListForm = ({boardUpdate}:{boardUpdate:()=>void}) => {
   const router = useRouter();
   const params = useParams();
 
@@ -38,6 +38,7 @@ export const ListForm = () => {
     onSuccess: (data) => {
       toast.success(`List "${data.title}" created`);
       disableEditing();
+      boardUpdate();
       router.refresh();
     },
     onError: (error) => {

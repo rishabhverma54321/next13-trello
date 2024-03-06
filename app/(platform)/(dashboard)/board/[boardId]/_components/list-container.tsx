@@ -15,6 +15,7 @@ import { ListItem } from "./list-item";
 interface ListContainerProps {
   data: ListWithCards[];
   boardId: string;
+  boardUpdate: () => void;
 };
 
 function reorder<T>(list: T[], startIndex: number, endIndex: number) {
@@ -28,6 +29,7 @@ function reorder<T>(list: T[], startIndex: number, endIndex: number) {
 export const ListContainer = ({
   data,
   boardId,
+  boardUpdate
 }: ListContainerProps) => {
   const [orderedData, setOrderedData] = useState(data);
 
@@ -164,11 +166,12 @@ export const ListContainer = ({
                   key={list.id}
                   index={index}
                   data={list}
+                  boardUpdate={boardUpdate}
                 />
               )
             })}
             {provided.placeholder}
-            <ListForm />
+            <ListForm boardUpdate={boardUpdate}/>
             <div className="flex-shrink-0 w-1" />
           </ol>
         )}

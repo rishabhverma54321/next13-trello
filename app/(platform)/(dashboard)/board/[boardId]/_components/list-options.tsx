@@ -21,11 +21,13 @@ import { Separator } from "@/components/ui/separator";
 interface ListOptionsProps {
   data: List;
   onAddCard: () => void;
+  boardUpdate: () => void;
 };
 
 export const ListOptions = ({
   data,
   onAddCard,
+  boardUpdate
 }: ListOptionsProps) => {
   const closeRef = useRef<ElementRef<"button">>(null);
 
@@ -33,6 +35,7 @@ export const ListOptions = ({
     onSuccess: (data) => {
       toast.success(`List "${data.title}" deleted`);
       closeRef.current?.click();
+      boardUpdate();
     },
     onError: (error) => {
       toast.error(error);
@@ -43,6 +46,7 @@ export const ListOptions = ({
     onSuccess: (data) => {
       toast.success(`List "${data.title}" copied`);
       closeRef.current?.click();
+      boardUpdate();
     },
     onError: (error) => {
       toast.error(error);
@@ -52,7 +56,6 @@ export const ListOptions = ({
   const onDelete = (formData: FormData) => {
     const id = formData.get("id") as string;
     const boardId = formData.get("boardId") as string;
-
     executeDelete({ id, boardId });
   };
 
