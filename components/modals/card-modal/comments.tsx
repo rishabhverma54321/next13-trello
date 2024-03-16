@@ -18,15 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Prisma, Comment, PrismaClient } from "@prisma/client";
 import { db } from "@/lib/db";
 import { createComment } from "@/actions/create-comment";
-
-
+import { CardWithList } from "@/types";
 
 interface CommentsProps {
-  cardId: string,
-  data: Comment[]
+  data: CardWithList;
 };
 
-export const Comments = ({data, cardId}: CommentsProps) => {
+export const Comments = ({data}: CommentsProps) => {
   const params = useParams();
   const queryClient = useQueryClient();
 
@@ -84,7 +82,7 @@ const onSubmit = (formData: FormData) => {
 
   execute({
     comment,
-    cardId: cardId
+    cardId: data.id
   })
 
 }

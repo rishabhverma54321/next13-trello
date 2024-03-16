@@ -56,9 +56,9 @@ export const CardModal = () => {
                 ? <Activity.Skeleton />
                 : <Activity items={auditLogsData} />
               }
-              {!commentdata
+              {!cardData
                ? <Comments.Skeleton />
-               : <Comments cardId={id} data={commentdata} /> 
+               : <Comments data={cardData} /> 
               }
             </div>
           </div>
