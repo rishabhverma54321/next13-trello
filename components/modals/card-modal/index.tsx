@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { CardWithList } from "@/types";
 import { fetcher } from "@/lib/fetcher";
-import { AuditLog } from "@prisma/client";
+import { AuditLog, Comment } from "@prisma/client";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -56,9 +56,9 @@ export const CardModal = () => {
                 ? <Activity.Skeleton />
                 : <Activity items={auditLogsData} />
               }
-              {!cardData
+              {!cardData || !commentdata
                ? <Comments.Skeleton />
-               : <Comments data={cardData} /> 
+               : <Comments data={cardData} items={commentdata} /> 
               }
             </div>
           </div>

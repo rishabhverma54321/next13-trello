@@ -24,28 +24,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   let commentdata;
 
   try {
-//     const list = await db.list.findUnique({
-//       where: {
-//         id: listId,
-//         board: {
-//           orgId,
-//         },
-//       },
-//     });
-
-//     if (!list) {
-//       return {
-//         error: "List not found",
-//       };
-//     }
-
-//     const lastCard = await db.card.findFirst({
-//       where: { listId },
-//       orderBy: { order: "desc" },
-//       select: { order: true },
-//     });
-
-//     const newOrder = lastCard ? lastCard.order + 1 : 1;
 
     commentdata = await db.comment.create({
       data: {
