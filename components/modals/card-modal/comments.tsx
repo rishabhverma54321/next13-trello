@@ -191,8 +191,8 @@ const [timeElapsed, setTimeElapsed] = useState<string>("");
           </div>
         )}
         <ol className="mt-2 space-y-4">
-            {items.map((item) => (
-                <li className="flex items-center gap-x-2">
+            {items.map((item, i) => (
+                <li key={i} className="flex items-center gap-x-2">
                   <Avatar className="h-8 w-8">
                     {/* <AvatarImage src={data.userImage} /> */}
                   </Avatar>
