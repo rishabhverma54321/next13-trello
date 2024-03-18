@@ -6,9 +6,9 @@ import { useParams } from "next/navigation";
 import { useState, useRef, ElementRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEventListener, useOnClickOutside } from "usehooks-ts";
+import { currentUser } from "@clerk/nextjs";
 
 import { useAction } from "@/hooks/use-action";
-import { updateCard } from "@/actions/update-card";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormTextarea } from "@/components/form/form-textarea";
@@ -28,9 +28,7 @@ interface CommentsProps {
   items: Comment[];
 };
 
-export const Comments = ({data, items}: CommentsProps) => {
-
-  console.log(items);
+export const Comments = ({ data, items }: CommentsProps) => {
 
   const params = useParams();
   const queryClient = useQueryClient();
@@ -62,62 +60,41 @@ export const Comments = ({data, items}: CommentsProps) => {
 
 
 
-const { execute, fieldErrors } = useAction(createComment, {
-  onSuccess: (result) => {
-    console.log("1")
-    queryClient.invalidateQueries({
-      queryKey: ["comment", result.cardId],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["card-logs", result.cardId]
-    });
-    toast.success(`Comment "${result.comment}" Created`);
-    disableEditing();
-  },
-  onError: (error) => {
-    console.log("2")
-    toast.error(error);
-  },
-  onComplete: () => {
-    console.log("3");
-  }
-});
-
-const boardId = params.boardId as string;
-const onSubmit = (formData: FormData) => {
-  const comment = formData.get("text") as string;
-
-  execute({
-    comment,
-    cardId: data.id
-  })
-
-}
-
-const [timeElapsed, setTimeElapsed] = useState<string>("");
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const distance = formatDistanceToNow(new Date(data.createdAt), {
-        addSuffix: true,
+  const { execute, fieldErrors } = useAction(createComment, {
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({
+        queryKey: ["comment", result.cardId],
       });
-      setTimeElapsed(distance);
-    }, 1000); // Update every second
+      queryClient.invalidateQueries({
+        queryKey: ["card-logs", result.cardId]
+      });
+      toast.success(`Comment "${result.comment}" Created`);
+      disableEditing();
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+    onComplete: () => {
+    }
+  });
 
-    return () => clearInterval(intervalId); // Cleanup interval on unmount
-  }, [data.createdAt]);
+  const boardId = params.boardId as string;
+  const onSubmit = (formData: FormData) => {
+    const comment = formData.get("text") as string;
 
-  const editCommentHandler = (id: String) => {
-    toast.message("edited => " + id);
+    execute({
+      comment,
+      cardId: data.id
+    })
+
   }
 
-
-  const { 
+  // Use action for delete comment functionality and also invalide the card modal
+  const {
     execute: execeutedeleteComment,
     isLoading: isLoadingDelete,
   } = useAction(deleteComment, {
     onSuccess: (result) => {
-      console.log("1")
 
       queryClient.invalidateQueries({
         queryKey: ["comment", result.cardId],
@@ -129,11 +106,32 @@ const [timeElapsed, setTimeElapsed] = useState<string>("");
       disableEditing();
     },
     onError: (error) => {
-      console.log("2")
       toast.error(error);
     },
     onComplete: () => {
-      console.log("3");
+    }
+  });
+
+  // Use action for update comment functionality and also invalide the card modal
+  const {
+    execute: execeuteupdateComment,
+
+  } = useAction(deleteComment, {
+    onSuccess: (result) => {
+
+      queryClient.invalidateQueries({
+        queryKey: ["comment", result.cardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["card-logs", result.cardId]
+      });
+      toast.success(`Comment "${result.comment}" Deleted`);
+      disableEditing();
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+    onComplete: () => {
     }
   });
 
@@ -143,7 +141,6 @@ const [timeElapsed, setTimeElapsed] = useState<string>("");
       id
     });
   }
-
 
   return (
 
@@ -163,7 +160,6 @@ const [timeElapsed, setTimeElapsed] = useState<string>("");
               id="text"
               className="w-full mt-2"
               placeholder="Add a more detailed description"
-              
               errors={fieldErrors}
               ref={textareaRef}
             />
@@ -190,32 +186,76 @@ const [timeElapsed, setTimeElapsed] = useState<string>("");
             {"Add a more detailed description..."}
           </div>
         )}
-        <ol className="mt-2 space-y-4">
-            {items.map((item, i) => (
-                <li key={i} className="flex items-center gap-x-2">
-                  <Avatar className="h-8 w-8">
-                    {/* <AvatarImage src={data.userImage} /> */}
-                  </Avatar>
-                  <div style={{width: "100%"}} className="flex flex-col space-y-0.5">
-                    <div className="mt-1 bg-slate-200 rounded-lg p-3">
-                      <p className="text-sm text-muted-foreground">
-                        <span className="font-semibold lowercase text-neutral-700">
-                          {item.comment}
-                        </span>{" "}
-                        {/* {generateLogMessage(data)} */}
-                      </p>
-                    </div>
-                    <div className="w-100 flex items-center justify-between">
-                      <div>
-                        <button className="text-xs text-muted-foreground me-2" onClick={() => editCommentHandler(item.id)}>Edit</button>
-                        <button className="text-xs text-muted-foreground" onClick={() => deleteCommentHandler(item.id)}>Delete</button>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{timeElapsed}</p>
-                    </div>
+        <ol className="mt-2 space-y-4 ps-4">
+          {items.map((item, i) => {
+            const [isCommentEdit, setCommentEdit] = useState(false);
+
+            const updateCommentHandler = (data: Comment) => {
+              setCommentEdit(true);
+            }
+
+            const onUpdateComment = (formData: FormData, item: Comment) => {
+              const comment = formData.get("updatedCommentText") as string;
+              toast.message("edited => " + item.id);
+              console.log(comment);
+            }
+
+            const distance = formatDistanceToNow(new Date(item.createdAt), {
+              addSuffix: true,
+            });
+            return <li key={i} className="flex-column items-center gap-x-2">
+              <div className="flex items-center gap-x-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage className="rounded" src={item.userImage} />
+                </Avatar>
+                <span style={{ fontSize: 12 }} className="font-bold">{item.userName}</span>
+              </div>
+              {!isCommentEdit ? (<div style={{ width: "100%" }} className="flex flex-col space-y-0.5">
+                <div className="mt-1 bg-slate-200 rounded-lg p-3">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-semibold lowercase text-neutral-700">
+                      {item.comment}
+                    </span>{" "}
+                    {/* {generateLogMessage(data)} */}
+                  </p>
+                </div>
+                <div className="w-100 flex items-center justify-between">
+                  <div>
+                    <button className="text-xs text-muted-foreground me-2" onClick={() => updateCommentHandler(item)}>Edit</button>
+                    <button className="text-xs text-muted-foreground" onClick={() => deleteCommentHandler(item.id)}>Delete</button>
                   </div>
-                </li>
-            ))}
-          </ol>
+                  <p className="text-xs text-muted-foreground">{distance}</p>
+                </div>
+              </div>)
+                : (
+                  <form
+                    action={(e) => onUpdateComment(e, item)}
+                    ref={formRef}
+                    className="space-y-2"
+                  >
+                    <FormTextarea
+                      id="updatedCommentText"
+                      className="w-full mt-2"
+                      placeholder="Add a more detailed description"
+                      defaultValue={item.comment}
+                    />
+                    <div className="flex items-center gap-x-2">
+                      <FormSubmit variant="outline">
+                        Update
+                      </FormSubmit>
+                      <Button
+                        type="button"
+                        onClick={() => setCommentEdit(false)}
+                        size="sm"
+                        variant="ghost"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>)}
+            </li>
+          })}
+        </ol>
       </div>
     </div>
   );

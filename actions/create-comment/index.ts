@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs";
 import { revalidatePath } from "next/cache";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 
@@ -20,15 +20,23 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { comment, cardId } = data;
+  const { comment, cardId} = data;
   let commentdata;
 
+  const user = await currentUser();
+  if (!user || !orgId) {
+    throw new Error("User not found!");
+  }
+  
   try {
-
+    
     commentdata = await db.comment.create({
       data: {
         comment,
-        cardId
+        cardId,
+        userId: user.id,
+        userImage: user.imageUrl,
+        userName: user.firstName + " " + user?.lastName,
       },
     });
 
@@ -39,11 +47,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       action: ACTION.CREATE,
     });
   } catch (error) {
+    console.log(error);
     return {
       error: "Failed to create comment."
     }
   }
-
+  
   revalidatePath(`/board/${cardId}`);
   return { data: commentdata };
 };

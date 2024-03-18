@@ -61,8 +61,11 @@ model Comment {
   id          String      @id @default(uuid())
   comment     String
   cardId      String      // Add a field to store the ID of the card associated with this comment
-
   card        Card        @relation("CardToComments", fields: [cardId], references: [id])
+  
+  userId      String
+  userImage   String @db.Text
+  userName    String @db.Text
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime?   @updatedAt
@@ -72,6 +75,7 @@ enum ACTION {
   CREATE
   UPDATE
   DELETE
+  POST
 }
 
 enum ENTITY_TYPE {

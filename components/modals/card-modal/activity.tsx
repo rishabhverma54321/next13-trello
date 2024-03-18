@@ -21,13 +21,12 @@ export const Activity = ({
           Activity
         </p>
         <ol className="mt-2 space-y-4">
-          {items.map((item) => {
-            console.log("item => ", item);
-            return <ActivityItem
+          {items.map((item) => (
+           <ActivityItem
               key={item.id}
               data={item}
             />
-          })}
+          ))}
         </ol>
       </div>
     </div>

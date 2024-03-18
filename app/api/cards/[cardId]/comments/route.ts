@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 
 export async function GET(
   request: Request,
-  { params }: { params: { cardId: String } }
+  { params }: { params: { cardId: string } }
 ) {
   try {
     const { userId, orgId } = auth();
@@ -15,6 +15,9 @@ export async function GET(
     }
 
     const comments = await db.comment.findMany({
+      where: {
+        cardId: params.cardId
+      },
       take: 3,
     });
 
