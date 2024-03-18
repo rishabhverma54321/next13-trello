@@ -10,6 +10,8 @@ import { currentUser } from "@clerk/nextjs";
 
 import { useAction } from "@/hooks/use-action";
 
+
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSubmit } from "@/components/form/form-submit";
@@ -22,6 +24,7 @@ import { CardWithList } from "@/types";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { formatDistanceToNow } from "date-fns";
 import { deleteComment } from "@/actions/delete-comment";
+import { updateComment } from "@/actions/update-comment";
 
 interface CommentsProps {
   data: CardWithList,
@@ -30,10 +33,13 @@ interface CommentsProps {
 
 export const Comments = ({ data, items }: CommentsProps) => {
 
+  const [editedCommentId, setEditedCommentId] = useState("");
+
   const params = useParams();
   const queryClient = useQueryClient();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isCommentEdit, setCommentEdit] = useState(false);
 
   const formRef = useRef<ElementRef<"form">>(null);
   const textareaRef = useRef<ElementRef<"textarea">>(null);
@@ -46,7 +52,9 @@ export const Comments = ({ data, items }: CommentsProps) => {
   }
 
   const disableEditing = () => {
+    setEditedCommentId("");
     setIsEditing(false);
+    setCommentEdit(false)
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -116,7 +124,7 @@ export const Comments = ({ data, items }: CommentsProps) => {
   const {
     execute: execeuteupdateComment,
 
-  } = useAction(deleteComment, {
+  } = useAction(updateComment, {
     onSuccess: (result) => {
 
       queryClient.invalidateQueries({
@@ -125,7 +133,7 @@ export const Comments = ({ data, items }: CommentsProps) => {
       queryClient.invalidateQueries({
         queryKey: ["card-logs", result.cardId]
       });
-      toast.success(`Comment "${result.comment}" Deleted`);
+      toast.success(`Comment "${result.comment}" updated`);
       disableEditing();
     },
     onError: (error) => {
@@ -140,6 +148,16 @@ export const Comments = ({ data, items }: CommentsProps) => {
     execeutedeleteComment({
       id
     });
+  }
+
+  const onUpdateComment = (formData: FormData, item: Comment) => {
+    const comment = formData.get("updatedCommentText") as string;
+    const id = item.id;
+    execeuteupdateComment({
+      comment,
+      commentId: id,
+      cardId: data.id
+    })
   }
 
   return (
@@ -186,31 +204,27 @@ export const Comments = ({ data, items }: CommentsProps) => {
             {"Add a more detailed description..."}
           </div>
         )}
+
         <ol className="mt-2 space-y-4 ps-4">
           {items.map((item, i) => {
-            const [isCommentEdit, setCommentEdit] = useState(false);
+
 
             const updateCommentHandler = (data: Comment) => {
+              setEditedCommentId(data.id);
               setCommentEdit(true);
-            }
-
-            const onUpdateComment = (formData: FormData, item: Comment) => {
-              const comment = formData.get("updatedCommentText") as string;
-              toast.message("edited => " + item.id);
-              console.log(comment);
             }
 
             const distance = formatDistanceToNow(new Date(item.createdAt), {
               addSuffix: true,
             });
-            return <li key={i} className="flex-column items-center gap-x-2">
+            return <li key={item.id} className="flex-column items-center gap-x-2">
               <div className="flex items-center gap-x-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage className="rounded" src={item.userImage} />
                 </Avatar>
                 <span style={{ fontSize: 12 }} className="font-bold">{item.userName}</span>
               </div>
-              {!isCommentEdit ? (<div style={{ width: "100%" }} className="flex flex-col space-y-0.5">
+              {!(editedCommentId === item.id) ? (<div style={{ width: "100%" }} className="flex flex-col space-y-0.5">
                 <div className="mt-1 bg-slate-200 rounded-lg p-3">
                   <p className="text-sm text-muted-foreground">
                     <span className="font-semibold lowercase text-neutral-700">
@@ -228,7 +242,7 @@ export const Comments = ({ data, items }: CommentsProps) => {
                 </div>
               </div>)
                 : (
-                  <form
+                  <>  <form
                     action={(e) => onUpdateComment(e, item)}
                     ref={formRef}
                     className="space-y-2"
@@ -245,17 +259,18 @@ export const Comments = ({ data, items }: CommentsProps) => {
                       </FormSubmit>
                       <Button
                         type="button"
-                        onClick={() => setCommentEdit(false)}
+                        onClick={() => setEditedCommentId("")}
                         size="sm"
                         variant="ghost"
                       >
                         Cancel
                       </Button>
                     </div>
-                  </form>)}
+                  </form></>)}
             </li>
           })}
         </ol>
+
       </div>
     </div>
   );
@@ -272,5 +287,3 @@ Comments.Skeleton = function DescriptionSkeleton() {
     </div>
   );
 };
-
-
