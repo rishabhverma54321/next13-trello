@@ -56,15 +56,16 @@ export const hasAvailableCount = async () => {
     throw new Error ("Unauthorized");
   }
 
-  const orgLimit = await db.orgLimit.findUnique({
-    where: { orgId }
-  });
+  // const orgLimit = await db.orgLimit.findUnique({
+  //   where: { orgId }
+  // });
 
-  if (!orgLimit || orgLimit.count < MAX_FREE_BOARDS) {
-    return true;
-  } else {
-    return false;
-  }
+  // if (!orgLimit || orgLimit.count < MAX_FREE_BOARDS) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
+  return true;
 };
 
 export const getAvailableCount = async () => {

@@ -52,14 +52,17 @@ export const CardModal = () => {
                 ? <Description.Skeleton />
                 : <Description data={cardData} />
               }
-              {!auditLogsData
-                ? <Activity.Skeleton />
-                : <Activity items={auditLogsData} />
-              }
+              
               {!cardData || !commentdata
                ? <Comments.Skeleton />
                : <Comments data={cardData} items={commentdata} /> 
               }
+
+              {!auditLogsData
+                ? <Activity.Skeleton />
+                : <Activity items={auditLogsData} />
+              }
+              
             </div>
           </div>
           {!cardData

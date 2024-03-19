@@ -9,6 +9,7 @@ import { useEventListener, useOnClickOutside } from "usehooks-ts";
 import { currentUser } from "@clerk/nextjs";
 
 import { useAction } from "@/hooks/use-action";
+import  DeleteDialog  from "./DeleteModal"
 
 
 
@@ -25,6 +26,7 @@ import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { formatDistanceToNow } from "date-fns";
 import { deleteComment } from "@/actions/delete-comment";
 import { updateComment } from "@/actions/update-comment";
+import { id } from "date-fns/locale";
 
 interface CommentsProps {
   data: CardWithList,
@@ -34,6 +36,7 @@ interface CommentsProps {
 export const Comments = ({ data, items }: CommentsProps) => {
 
   const [editedCommentId, setEditedCommentId] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const params = useParams();
   const queryClient = useQueryClient();
@@ -43,6 +46,16 @@ export const Comments = ({ data, items }: CommentsProps) => {
 
   const formRef = useRef<ElementRef<"form">>(null);
   const textareaRef = useRef<ElementRef<"textarea">>(null);
+
+  const [commentModals, setCommentModals] = useState<{ [key: string]: boolean }>({});
+
+  const handleDeleteClick = (commentId: string) => {
+    setCommentModals(prevState => ({
+      ...prevState,
+      [commentId]: true
+    }));
+  };
+
 
   const enableEditing = () => {
     setIsEditing(true);
@@ -148,7 +161,20 @@ export const Comments = ({ data, items }: CommentsProps) => {
     execeutedeleteComment({
       id
     });
+
+    setCommentModals(prevState => ({
+      ...prevState,
+      [id]: false
+    }));
   }
+
+  const handleCancelDelete = (commentId: string) => {
+    setCommentModals(prevState => ({
+      ...prevState,
+      [commentId]: false
+    }));
+  };
+
 
   const onUpdateComment = (formData: FormData, item: Comment) => {
     const comment = formData.get("updatedCommentText") as string;
@@ -236,7 +262,12 @@ export const Comments = ({ data, items }: CommentsProps) => {
                 <div className="w-100 flex items-center justify-between">
                   <div>
                     <button className="text-xs text-muted-foreground me-2" onClick={() => updateCommentHandler(item)}>Edit</button>
-                    <button className="text-xs text-muted-foreground" onClick={() => deleteCommentHandler(item.id)}>Delete</button>
+                    {/* <button className="text-xs text-muted-foreground" onClick={() => deleteCommentHandler(item.id)}>Delete</button> */}
+                    <button className="text-xs text-muted-foreground" onClick={()=>{handleDeleteClick(item.id)}}>Delete</button>
+                   
+                    <DeleteDialog isOpen={commentModals[item.id] || false}  onConfirm={()=>{deleteCommentHandler(item.id)}} onClose={()=>{handleCancelDelete(item.id)} } />
+                    
+   
                   </div>
                   <p className="text-xs text-muted-foreground">{distance}</p>
                 </div>
@@ -272,7 +303,12 @@ export const Comments = ({ data, items }: CommentsProps) => {
         </ol>
 
       </div>
+
+
+      
     </div>
+
+
   );
 };
 
