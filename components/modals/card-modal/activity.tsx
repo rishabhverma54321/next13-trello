@@ -22,7 +22,7 @@ export const Activity = ({
         </p>
         <ol className="mt-2 space-y-4">
           {items.map((item) => (
-            <ActivityItem
+           <ActivityItem
               key={item.id}
               data={item}
             />

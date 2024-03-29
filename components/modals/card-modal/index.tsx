@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { CardWithList } from "@/types";
 import { fetcher } from "@/lib/fetcher";
-import { AuditLog } from "@prisma/client";
+import { AuditLog, Comment } from "@prisma/client";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -13,6 +13,7 @@ import { Description } from "./description";
 import { Actions } from "./actions";
 import { Activity } from "./activity";
 import { useEffect, useState } from "react";
+import { Comments } from "./comments";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -40,7 +41,13 @@ export const CardModal = () => {
     enabled: isOpen,
   });
 
-  const { data: auditLogsData, isLoading } = useQuery<AuditLog[]>({
+  
+  const { data: commentdata } = useQuery<Comment[]>({
+    queryKey: ["comment", id],
+    queryFn: () => fetcher(`/api/cards/${id}/comments`),
+  });
+
+  const { data: auditLogsData } = useQuery<AuditLog[]>({
     queryKey: ["card-logs", id],
     queryFn: () => fetcher(`/api/cards/${id}/logs`),
     enabled: isOpen || fetchLogs,
@@ -71,7 +78,7 @@ export const CardModal = () => {
       open={isOpen}
       onOpenChange={onClose}
     >
-      <DialogContent>
+      <DialogContent className="h-[80vh] overflow-y-auto">
         {!cardData
           ? <Header.Skeleton />
           : <Header data={cardData} getAuditLogs={getAuditLogs}/>
@@ -83,10 +90,17 @@ export const CardModal = () => {
                 ? <Description.Skeleton />
                 : <Description data={cardData} getAuditLogs={getAuditLogs}/>
               }
+              
+              {!cardData || !commentdata
+               ? <Comments.Skeleton />
+               : <Comments data={cardData} items={commentdata} /> 
+              }
+
               {!auditLogsData
                 ? <Activity.Skeleton />
                 : <Activity items={auditLogsData} />
               }
+              
             </div>
           </div>
           {!cardData

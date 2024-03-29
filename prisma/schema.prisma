@@ -41,30 +41,48 @@ model List {
 }
 
 model Card {
-  id          String @id @default(uuid())
+  id          String      @id @default(uuid())
   title       String
   order       Int
-  description String? @db.Text
+  description String?     @db.Text
 
   listId      String
-  list        List  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  list        List        @relation(fields: [listId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  comments    Comment[]   @relation("CardToComments")
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([listId])
+}
+
+model Comment {
+  id          String      @id @default(uuid())
+  comment     String
+  cardId      String      // Add a field to store the ID of the card associated with this comment
+  card        Card        @relation("CardToComments", fields: [cardId], references: [id])
+  
+  userId      String
+  userImage   String @db.Text
+  userName    String @db.Text
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
 }
 
 enum ACTION {
   CREATE
   UPDATE
   DELETE
+  POST
 }
 
 enum ENTITY_TYPE {
   BOARD
   LIST
   CARD
+  COMMENT
 }
 
 model AuditLog {

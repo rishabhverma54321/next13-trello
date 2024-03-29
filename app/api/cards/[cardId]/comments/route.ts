@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { ENTITY_TYPE } from "@prisma/client";
 
 import { db } from "@/lib/db";
 
@@ -15,19 +14,14 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const auditLogs = await db.auditLog.findMany({
+    const comments = await db.comment.findMany({
       where: {
-        orgId,
-        entityId: params.cardId,
-
+        cardId: params.cardId
       },
-      orderBy: {
-        createdAt: "desc",
-      },  
       take: 3,
     });
 
-    return NextResponse.json(auditLogs);
+    return NextResponse.json(comments);
   } catch (error) {
     return new NextResponse("Internal Error", { status: 500 });
   }
