@@ -15,6 +15,13 @@ import { FormTextarea } from "@/components/form/form-textarea";
 import { FormSubmit } from "@/components/form/form-submit";
 import { Button } from "@/components/ui/button";
 
+import { Content } from "next/font/google";
+
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import ReactHtmlParser from 'react-html-parser';
+
+
 interface DescriptionProps {
   data: CardWithList;
   getAuditLogs: () => void;
@@ -24,12 +31,25 @@ export const Description = ({
   data,
   getAuditLogs
 }: DescriptionProps) => {
+
+  const [description, setDescription] = useState<string>(data.description || '');
+  const [pdfUrl, setPdfUrl] = useState<string>('');
+
+
+ 
+  const handleChange = (value: string) => {
+    setDescription(value);
+  };
+
+
   const params = useParams();
   const queryClient = useQueryClient();
 
   const [isEditing, setIsEditing] = useState(false);
 
   const formRef = useRef<ElementRef<"form">>(null);
+  const editorRef = useRef<any>(null);
+
   const textareaRef = useRef<ElementRef<"textarea">>(null);
 
   const enableEditing = () => {
@@ -66,16 +86,58 @@ export const Description = ({
     },
   });
 
-  const onSubmit = (formData: FormData) => {
-    const description = formData.get("description") as string;
-    const boardId = params.boardId as string;
+  // const onSubmit = (formData: FormData) => {
+  //   const description = formData.get("description") as string;
+  //   const boardId = params.boardId as string;
 
+  //   execute({
+  //     id: data.id,
+  //     description,
+  //     boardId,
+  //   })
+  // }
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const boardId = params.boardId as string;
+    const updatedDescription = editorRef.current?.getEditor().root.innerHTML; // Get HTML content from React Quill
     execute({
       id: data.id,
-      description,
+      description: updatedDescription || '',
       boardId,
-    })
+    });
   }
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image"],
+      
+      ["clean"],
+
+      
+    ],
+
+    
+  };
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "link",
+    "image",
+    
+  ];
+
+  
+ 
 
   return (
     <div className="flex items-start gap-x-3 w-full">
@@ -86,18 +148,31 @@ export const Description = ({
         </p>
         {isEditing ? (
           <form
-            action={onSubmit}
+            // action={onSubmit}
+            onSubmit={onSubmit}
             ref={formRef}
             className="space-y-2"
           >
-            <FormTextarea
+          
+      
+          <ReactQuill
+            theme="snow"
+            value={description}
+            onChange={setDescription} // This will update the React Quill content and also the form content
+            ref={editorRef}
+            modules={modules}
+            formats={formats}
+            
+            
+          />
+            {/* <FormTextarea
               id="description"
               className="w-full mt-2"
               placeholder="Add a more detailed description"
               defaultValue={data.description || undefined}
               errors={fieldErrors}
               ref={textareaRef}
-            />
+            /> */}
             <div className="flex items-center gap-x-2">
               <FormSubmit>
                 Save
@@ -116,9 +191,13 @@ export const Description = ({
           <div
             onClick={enableEditing}
             role="button"
-            className="min-h-[78px] bg-neutral-200 text-sm font-medium py-3 px-3.5 rounded-md"
+            className="min-h-[78px] bg-neutral-200 font-medium py-3 px-3.5 rounded-md"
           >
-            {data.description || "Add a more detailed description..."}
+            {/* {data.description || "Add a more detailed description..."} */}
+
+            <div className="description-content">
+              {ReactHtmlParser(description) || "Add a more detailed description..."}
+            </div>
           </div>
         )}
       </div>

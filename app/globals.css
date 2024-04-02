@@ -8,6 +8,18 @@ body,
   height: 100%;
 }
  
+.description-content h1 {
+  font-size: 2rem;
+}
+
+.description-content h2 {
+  font-size: 1.5rem;
+}
+
+.description-content h3 {
+  font-size: 1.25rem;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
