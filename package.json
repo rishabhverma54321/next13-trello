@@ -44,7 +44,6 @@
     "react": "^18",
     "react-dom": "^18",
     "react-filepond": "^7.1.2",
-    "react-html-parser": "^2.0.2",
     "react-quill": "^2.0.0",
     "sonner": "^1.4.0",
     "stripe": "^14.4.0",

@@ -19,7 +19,7 @@ import { Content } from "next/font/google";
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import ReactHtmlParser from 'react-html-parser';
+// import ReactHtmlParser from 'react-html-parser';
 import cloudinary from "cloudinary"
 
 
@@ -251,7 +251,7 @@ export const Description = ({
             {/* {data.description || "Add a more detailed description..."} */}
 
             <div className="description-content">
-              {ReactHtmlParser(description) || "Add a more detailed description..."}
+              {<div dangerouslySetInnerHTML={{__html: description}}></div> || "Add a more detailed description..."}
             </div>
           </div>
         )}
