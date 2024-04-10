@@ -7,6 +7,7 @@ export const UpdateComment = z.object({
     }).min(3, {
         message: "Comment is too short",
     }),
+    userCommentedId: z.string()
 
    
 });

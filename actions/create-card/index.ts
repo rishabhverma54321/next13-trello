@@ -10,6 +10,7 @@ import { createSafeAction } from "@/lib/create-safe-action";
 
 import { CreateCard } from "./schema";
 import { InputType, ReturnType } from "./types";
+import { json } from "stream/consumers";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId, orgId } = auth();
@@ -55,11 +56,15 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
     });
 
+    
+
     createAuditLog({
       entityId: card.id,
       entityTitle: card.title,
       entityType: ENTITY_TYPE.CARD,
       action: ACTION.CREATE,
+      userId: userId,
+      
     });
   } catch (error) {
     return {

@@ -20,13 +20,14 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { comment, commentId, cardId} = data;
+  const { comment, commentId, cardId, userCommentedId} = data;
   let commentdata;
 
   const user = await currentUser();
   if (!user || !orgId) {
     throw new Error("User not found!");
   }
+  
   
   try {
     
@@ -46,6 +47,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityTitle: commentdata.comment,
       entityType: ENTITY_TYPE.COMMENT,
       action: ACTION.CREATE,
+      userId:userId
     }); 
 
   } catch (error) {

@@ -20,12 +20,44 @@ import { Content } from "next/font/google";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ReactHtmlParser from 'react-html-parser';
+import cloudinary from "cloudinary"
+
+
 
 
 interface DescriptionProps {
   data: CardWithList;
   getAuditLogs: () => void;
 };
+
+
+
+// const uploadPdf = async (file: File) => {
+//   try {
+//     const formData = new FormData();
+//     formData.append('file', file);
+
+//     const response = await fetch(`https://api.cloudinary.com/v1_1/dal3cxij4/upload`, {
+//       method: 'POST',
+//       body: formData, // Just pass formData directly
+//       headers: {
+//         'Content-Type': 'multipart/form-data'
+//       },
+//       mode: 'no-cors' // Try setting mode to 'no-cors'
+//     });
+
+//     if (!response.ok) {
+//       throw new Error('Failed to upload PDF file to Cloudinary');
+//     }
+
+//     const data = await response.json();
+//     return data.secure_url;
+//   } catch (error) {
+//     console.error("Error uploading PDF file to Cloudinary:", error);
+//     throw new Error("Failed to upload PDF file to Cloudinary");
+//   }
+// };
+
 
 export const Description = ({
   data,
@@ -34,6 +66,7 @@ export const Description = ({
 
   const [description, setDescription] = useState<string>(data.description || '');
   const [pdfUrl, setPdfUrl] = useState<string>('');
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
 
  
@@ -62,6 +95,16 @@ export const Description = ({
   const disableEditing = () => {
     setIsEditing(false);
   };
+
+  const onPdfInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPdfFile(file);
+    } else {
+      toast.error("Please select a PDF file");
+    }
+  };
+
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -97,16 +140,27 @@ export const Description = ({
   //   })
   // }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const boardId = params.boardId as string;
-    const updatedDescription = editorRef.current?.getEditor().root.innerHTML; // Get HTML content from React Quill
+    const updatedDescription = editorRef.current?.getEditor().root.innerHTML;
+    // if (pdfFile) {
+    //   try {
+    //     const pdfUrl = await uploadPdf(pdfFile); // Pass the File object directly
+    //     setPdfUrl(pdfUrl);
+    //   } catch (error) {
+    //     console.error("Error uploading PDF file:", error);
+    //     toast.error("Failed to upload PDF file");
+    //     return;
+    //   }
+    // }
     execute({
       id: data.id,
       description: updatedDescription || '',
-      boardId,
+      // pdfUrl: pdfUrl, // Use the uploaded PDF URL
+      boardId: params.boardId as string,
     });
-  }
+    disableEditing();
+  };
 
   const modules = {
     toolbar: [
@@ -152,6 +206,7 @@ export const Description = ({
             onSubmit={onSubmit}
             ref={formRef}
             className="space-y-2"
+            encType="multipart/form-data"
           >
           
       

@@ -45,6 +45,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityTitle: commentdata.comment,
       entityType: ENTITY_TYPE.COMMENT,
       action: ACTION.CREATE,
+      userId:userId
     });
   } catch (error) {
     console.log(error);
