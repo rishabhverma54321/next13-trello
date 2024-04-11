@@ -61,6 +61,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityId: card.id,
       entityType: ENTITY_TYPE.CARD,
       action: ACTION.CREATE,
+      userId:userId
     })
   } catch (error) {
     return {

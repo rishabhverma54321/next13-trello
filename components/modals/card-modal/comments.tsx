@@ -35,6 +35,8 @@ interface CommentsProps {
 
 export const Comments = ({ data, items }: CommentsProps) => {
 
+  
+
   const [editedCommentId, setEditedCommentId] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -157,9 +159,10 @@ export const Comments = ({ data, items }: CommentsProps) => {
   });
 
 
-  const deleteCommentHandler = (id: string) => {
+  const deleteCommentHandler = (id: string, userId:string) => {
     execeutedeleteComment({
-      id
+      id,
+      userid: userId
     });
 
     setCommentModals(prevState => ({
@@ -182,7 +185,8 @@ export const Comments = ({ data, items }: CommentsProps) => {
     execeuteupdateComment({
       comment,
       commentId: id,
-      cardId: data.id
+      cardId: data.id,
+      userCommentedId:item.userId
     })
   }
 
@@ -233,7 +237,7 @@ export const Comments = ({ data, items }: CommentsProps) => {
 
         <ol className="mt-2 space-y-4 ps-4">
           {items.map((item, i) => {
-
+            
 
             const updateCommentHandler = (data: Comment) => {
               setEditedCommentId(data.id);
@@ -265,7 +269,7 @@ export const Comments = ({ data, items }: CommentsProps) => {
                     {/* <button className="text-xs text-muted-foreground" onClick={() => deleteCommentHandler(item.id)}>Delete</button> */}
                     <button className="text-xs text-muted-foreground" onClick={()=>{handleDeleteClick(item.id)}}>Delete</button>
                    
-                    <DeleteDialog isOpen={commentModals[item.id] || false}  onConfirm={()=>{deleteCommentHandler(item.id)}} onClose={()=>{handleCancelDelete(item.id)} } />
+                    <DeleteDialog isOpen={commentModals[item.id] || false}  onConfirm={()=>{deleteCommentHandler(item.id, item.userId)}} onClose={()=>{handleCancelDelete(item.id)} } />
                     
    
                   </div>

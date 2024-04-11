@@ -40,6 +40,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityId: card.id,
       entityType: ENTITY_TYPE.CARD,
       action: ACTION.DELETE,
+      userId:userId
     })
   } catch (error) {
     return {

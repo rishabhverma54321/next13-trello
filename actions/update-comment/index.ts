@@ -20,7 +20,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { comment, commentId, cardId} = data;
+  const { comment, commentId, cardId, userCommentedId} = data;
   let commentdata;
 
   const user = await currentUser();
@@ -28,6 +28,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     throw new Error("User not found!");
   }
   
+  if(userCommentedId===userId){
   try {
     
     commentdata = await db.comment.update({
@@ -46,6 +47,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityTitle: commentdata.comment,
       entityType: ENTITY_TYPE.COMMENT,
       action: ACTION.CREATE,
+      userId:userId
     }); 
 
   } catch (error) {
@@ -56,6 +58,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/board/${cardId}`);
   return{data: commentdata}
+}
+else{
+  return{
+    error:"You are unauthorized to update this comment"
+  }
+}
 };
 
 export const updateComment = createSafeAction(UpdateComment, handler);

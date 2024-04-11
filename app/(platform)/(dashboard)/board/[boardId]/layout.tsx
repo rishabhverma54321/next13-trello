@@ -9,6 +9,7 @@ import { BoardNavbar } from "./_components/board-navbar";
 import { useAction } from "@/hooks/use-action";
 import { getBoard } from "@/actions/get-board";
 import Image from "next/image";
+import { NewSideMenu } from "../../_components/NewSideMenu";
 
 // export async function generateMetadata({
 //   params,
@@ -69,15 +70,20 @@ const BoardIdLayout = ({
     );
   }
 
+
   if (data) {
     return (
       <div
-        className="relative h-full bg-no-repeat bg-cover bg-center"
+        className="flex-1 relative h-full bg-no-repeat bg-cover bg-center"
         style={{ backgroundImage: `url(${data.imageFullUrl})` }}
       >
         <BoardNavbar data={data} />
-        <div className="absolute inset-0 bg-black/10" />
-        <main className="relative pt-28 h-full">{children}</main>
+        {/* <div className="absolute inset-0 bg-black/10" /> */}
+        <div className="h-full flex align-bottom">
+          <NewSideMenu data={[data]} />
+          <main className="relative pt-28 h-full">{children}</main>
+        </div>
+
       </div>
     );
   }
