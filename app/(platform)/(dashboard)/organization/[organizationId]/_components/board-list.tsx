@@ -83,8 +83,8 @@ export const BoardList = async () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {boards.map((board) => (
-            <div className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
+          {boards.map((board, boardId) => (
+            <div key={boardId} className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
               {/* {(orgRole === 'org:admin') ? <input style = {{height:'20px'}}  type="checkbox" onChange={HandleCheckbox}></input> : null} */}
 
 
@@ -164,9 +164,9 @@ export const BoardList = async () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Completedboards.map((board) => (
+            {Completedboards.map((board, boardId) => (
 
-              <div className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
+              <div key={boardId} className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
                 {/* {(orgRole === 'org:admin') ? <input style = {{height:'20px'}}  type="checkbox" onChange={HandleCheckbox}></input> : null} */}
 
                 {/* {(orgRole === 'org:admin') ? <Modal boardId={board.id} /> : null} */}
