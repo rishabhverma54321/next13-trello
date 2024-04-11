@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 import { AlignLeft } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState, useRef, ElementRef } from "react";
+import { useState, useRef, ElementRef, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEventListener, useOnClickOutside } from "usehooks-ts";
 
@@ -18,9 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Content } from "next/font/google";
 
 import ReactQuill from 'react-quill';
+
 import 'react-quill/dist/quill.snow.css';
 // import ReactHtmlParser from 'react-html-parser';
 import cloudinary from "cloudinary"
+import dynamic from "next/dynamic";
 
 
 
@@ -32,37 +34,12 @@ interface DescriptionProps {
 
 
 
-// const uploadPdf = async (file: File) => {
-//   try {
-//     const formData = new FormData();
-//     formData.append('file', file);
-
-//     const response = await fetch(`https://api.cloudinary.com/v1_1/dal3cxij4/upload`, {
-//       method: 'POST',
-//       body: formData, // Just pass formData directly
-//       headers: {
-//         'Content-Type': 'multipart/form-data'
-//       },
-//       mode: 'no-cors' // Try setting mode to 'no-cors'
-//     });
-
-//     if (!response.ok) {
-//       throw new Error('Failed to upload PDF file to Cloudinary');
-//     }
-
-//     const data = await response.json();
-//     return data.secure_url;
-//   } catch (error) {
-//     console.error("Error uploading PDF file to Cloudinary:", error);
-//     throw new Error("Failed to upload PDF file to Cloudinary");
-//   }
-// };
-
 
 export const Description = ({
   data,
   getAuditLogs
 }: DescriptionProps) => {
+
 
   const [description, setDescription] = useState<string>(data.description || '');
   const [pdfUrl, setPdfUrl] = useState<string>('');
@@ -129,30 +106,12 @@ export const Description = ({
     },
   });
 
-  // const onSubmit = (formData: FormData) => {
-  //   const description = formData.get("description") as string;
-  //   const boardId = params.boardId as string;
 
-  //   execute({
-  //     id: data.id,
-  //     description,
-  //     boardId,
-  //   })
-  // }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const updatedDescription = editorRef.current?.getEditor().root.innerHTML;
-    // if (pdfFile) {
-    //   try {
-    //     const pdfUrl = await uploadPdf(pdfFile); // Pass the File object directly
-    //     setPdfUrl(pdfUrl);
-    //   } catch (error) {
-    //     console.error("Error uploading PDF file:", error);
-    //     toast.error("Failed to upload PDF file");
-    //     return;
-    //   }
-    // }
+ 
     execute({
       id: data.id,
       description: updatedDescription || '',
@@ -214,7 +173,7 @@ export const Description = ({
             theme="snow"
             value={description}
             onChange={setDescription} // This will update the React Quill content and also the form content
-            ref={editorRef}
+            // ref={editorRef}
             modules={modules}
             formats={formats}
             
@@ -225,6 +184,7 @@ export const Description = ({
               className="w-full mt-2"
               placeholder="Add a more detailed description"
               defaultValue={data.description || undefined}
+              
               errors={fieldErrors}
               ref={textareaRef}
             /> */}

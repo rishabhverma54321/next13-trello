@@ -28,7 +28,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     throw new Error("User not found!");
   }
   
-  
+  if(userCommentedId===userId){
   try {
     
     commentdata = await db.comment.update({
@@ -58,6 +58,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   revalidatePath(`/board/${cardId}`);
   return{data: commentdata}
+}
+else{
+  return{
+    error:"You are unauthorized to update this comment"
+  }
+}
 };
 
 export const updateComment = createSafeAction(UpdateComment, handler);
