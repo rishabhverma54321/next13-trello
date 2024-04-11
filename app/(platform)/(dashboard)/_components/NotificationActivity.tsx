@@ -101,17 +101,17 @@ const NotificationActivity = () => {
 
             <div>
 
-                <button onClick={handleCheckbox} style={{marginTop:"14px", marginLeft:"10px"}}>
+                <button onClick={handleCheckbox} style={{ marginTop: "14px", marginLeft: "10px" }}>
 
-                    
-                        <Bell />
-                        {notificationLog.filter(item => !item.isRead).length > 0 && (
+
+                    <Bell />
+                    {notificationLog.filter(item => !item.isRead).length > 0 && (
                         <span className="bg-red-500 text-white rounded-full px-2 py-1 relative -top-2 -right-2">
                             {notificationLog.filter(item => !item.isRead).length}
                         </span>
                     )}
 
-{/* <Badge content={notificationLog.filter(item=> !item.isRead).length} color="primary"> </Badge> */}
+                    {/* <Badge content={notificationLog.filter(item=> !item.isRead).length} color="primary"> </Badge> */}
 
                 </button>
 
@@ -148,12 +148,12 @@ const NotificationActivity = () => {
                                     <ol className="mt-2 space-y-4 w-full h-full ">
 
 
-                                        {data.filter(data => !data.isRead).map((item) => (
+                                        {data.filter(data => !data.isRead).map((item, notificationId) => (
 
 
 
 
-                                            <div className="flex gap-2 items-center">
+                                            <div key={notificationId} className="flex gap-2 items-center">
 
 
 
