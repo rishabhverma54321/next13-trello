@@ -38,7 +38,7 @@ const handleCompletedClick = async (boardId: any) => {
       // Refetch data after marking notification as read
       // await refetch();
   } catch (error) {
-      console.error("Error marking notification as read:", error);
+      // console.error("Error marking notification as read:", error);
   }
 
   setChecked(false)

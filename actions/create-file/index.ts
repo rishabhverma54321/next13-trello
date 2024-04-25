@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { createSafeAction } from "@/lib/create-safe-action";
 
-import { CreateComment } from "./schema";
+import { CreateFile } from "./schema";
 import { InputType, ReturnType } from "./types";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
@@ -20,8 +20,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { comment, cardId} = data;
-  let commentdata;
+  const { fileName, cardId, downloadUrl} = data;
+  let FileData;
 
   const user = await currentUser();
   if (!user || !orgId) {
@@ -32,41 +32,36 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   
   try {
     
-    commentdata = await db.comment.create({
+    FileData = await db.file.create({
       data: {
 
-
-        comment,
-        cardId,
-        userId: user.id,
-        userImage: user.imageUrl,
-        userName: user.firstName + " " + user?.lastName,
-        userRole: orgRole || "member"
-      
-        
+        fileName: fileName,
+        downloadUrl: downloadUrl,
+        cardId: cardId,
+        userId: userId
         
 
       },
     });
 
-    await createAuditLog({
-      entityId: cardId,
-      entityTitle: commentdata.comment,
-      entityType: ENTITY_TYPE.COMMENT,
-      action: ACTION.CREATE,
-      userId:userId
-    });
+    // await createAuditLog({
+    //   entityId: cardId,
+    //   entityTitle: commentdata.comment,
+    //   entityType: ENTITY_TYPE.COMMENT,
+    //   action: ACTION.CREATE,
+    //   userId:userId
+    // });
 
    
   } catch (error) {
     // console.log(error);
     return {
-      error: "Failed to create comment."
+      error: "Failed to upload File"
     }
   }
   
   revalidatePath(`/board/${cardId}`);
-  return { data: commentdata };
+  return { data: FileData };
 };
 
-export const createComment = createSafeAction(CreateComment, handler);
+export const createFile = createSafeAction(CreateFile, handler);

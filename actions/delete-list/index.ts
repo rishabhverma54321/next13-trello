@@ -20,9 +20,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
+  console.log("Hey this is samarth jain")
+
   const { id, boardId } = data;
   let list;
-
+   // console.log("List Id " + id)
   try {
     list = await db.list.delete({
       where: {
@@ -34,16 +36,21 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
     });
 
-    await createAuditLog({
-      entityTitle: list.title,
-      entityId: list.id,
-      entityType: ENTITY_TYPE.LIST,
-      action: ACTION.DELETE,
-      userId:userId
-    })
+
+
+    // await createAuditLog({
+    //   entityTitle: list.title,
+    //   entityId: list.id,
+    //   entityType: ENTITY_TYPE.LIST,
+    //   action: ACTION.DELETE,
+    //   userId:userId
+    // })
   } catch (error) {
+
+    // console.log("error message "+ error + " Error message ended")
     return {
-      error: "Failed to delete."
+      error: "Failed to delete.",
+     
     }
   }
 

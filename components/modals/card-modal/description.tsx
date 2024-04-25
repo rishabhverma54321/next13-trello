@@ -17,12 +17,15 @@ import { Button } from "@/components/ui/button";
 
 import { Content } from "next/font/google";
 
+
 import ReactQuill from 'react-quill';
 
 import 'react-quill/dist/quill.snow.css';
 // import ReactHtmlParser from 'react-html-parser';
 import cloudinary from "cloudinary"
 import dynamic from "next/dynamic";
+import { app } from "@/firebaseConfig";
+import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
 
 
 
@@ -46,7 +49,43 @@ export const Description = ({
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
 
- 
+
+  //File Uploading Code   
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e: any) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      // uploadFile(selectedFile);
+
+    } else {
+      return ('Please select a file');
+    }
+  };
+
+  const Storage = getStorage(app) 
+
+  const uploadFile = (file:any) => {
+      const metadata = {
+        contentType: file.type
+      } 
+
+      
+      const storageRef = ref(Storage, 'file-upload/'+file?.name)
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata)
+
+      uploadTask.on('state_changed',
+  (snapshot) => {
+    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    // console.log('Upload is ' + progress + '% done');
+   
+  })
+
+
+  }
+
   const handleChange = (value: string) => {
     setDescription(value);
   };
@@ -111,7 +150,7 @@ export const Description = ({
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const updatedDescription = editorRef.current?.getEditor().root.innerHTML;
- 
+
     execute({
       id: data.id,
       description: updatedDescription || '',
@@ -127,13 +166,13 @@ export const Description = ({
       ["bold", "italic", "underline", "strike", "blockquote"],
       [{ list: "ordered" }, { list: "bullet" }],
       ["link", "image"],
-      
+
       ["clean"],
 
-      
+
     ],
 
-    
+
   };
   const formats = [
     "header",
@@ -146,11 +185,11 @@ export const Description = ({
     "bullet",
     "link",
     "image",
-    
+
   ];
 
-  
- 
+
+
 
   return (
     <div className="flex items-start gap-x-3 w-full">
@@ -159,27 +198,34 @@ export const Description = ({
         <p className="font-semibold text-neutral-700 mb-2">
           Description
         </p>
+
         {isEditing ? (
-          <form
-            // action={onSubmit}
-            onSubmit={onSubmit}
-            ref={formRef}
-            className="space-y-2"
-            encType="multipart/form-data"
-          >
+
+          <>
+
+
+
+            <form
+              // action={onSubmit}
+              onSubmit={onSubmit}
+              ref={formRef}
+              className="space-y-2"
+              encType="multipart/form-data"
+            >
           
-      
-          <ReactQuill
-            theme="snow"
-            value={description}
-            onChange={setDescription} // This will update the React Quill content and also the form content
-            // ref={editorRef}
-            modules={modules}
-            formats={formats}
-            
-            
-          />
-            {/* <FormTextarea
+
+
+              <ReactQuill
+                theme="snow"
+                value={description}
+                onChange={setDescription} // This will update the React Quill content and also the form content
+                ref={editorRef}
+                modules={modules}
+                formats={formats}
+
+
+              />
+              {/* <FormTextarea
               id="description"
               className="w-full mt-2"
               placeholder="Add a more detailed description"
@@ -188,20 +234,24 @@ export const Description = ({
               errors={fieldErrors}
               ref={textareaRef}
             /> */}
-            <div className="flex items-center gap-x-2">
-              <FormSubmit>
-                Save
-              </FormSubmit>
-              <Button
-                type="button"
-                onClick={disableEditing}
-                size="sm"
-                variant="ghost"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
+              <div className="flex items-center gap-x-2">
+                <FormSubmit>
+                  Save
+                </FormSubmit>
+                <Button
+                  type="button"
+                  onClick={disableEditing}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+
+            
+
+          </>
         ) : (
           <div
             onClick={enableEditing}
@@ -211,7 +261,7 @@ export const Description = ({
             {/* {data.description || "Add a more detailed description..."} */}
 
             <div className="description-content">
-              {<div dangerouslySetInnerHTML={{__html: description}}></div> || "Add a more detailed description..."}
+              {<div dangerouslySetInnerHTML={{ __html: description }}></div> || "Add a more detailed description..."}
             </div>
           </div>
         )}

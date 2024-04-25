@@ -51,7 +51,7 @@ const NotificationActivity = () => {
     // Update the component state with fetched data
     useEffect(() => {
         if (data) {
-            console.log(data)
+            // console.log(data)
             setNotificationLog(data);
 
 
@@ -89,7 +89,7 @@ const NotificationActivity = () => {
             // Refetch data after marking notification as read
             // await refetch();
         } catch (error) {
-            console.error("Error marking notification as read:", error);
+            // console.error("Error marking notification as read:", error);
         }
 
     };

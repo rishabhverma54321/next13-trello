@@ -8,9 +8,46 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id            String    @id
+  name          String?
+  email         String?
+  image         String?
+  organizations Orgusers[]
+ 
+ 
+}
+
+model Organization {
+  id           String    @id
+  title        String
+  image        String
+  users        Orgusers[]
+  
+  
+  createdAt    DateTime    @default(now())
+} 
+
+
+model Orgusers{
+
+  id           String   @id @default(uuid())
+  userId       String
+  orgId        String
+  
+  user         User  @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id])
+
+
+
+}
+
+
 model Board {
   id            String @id @default(uuid())
   orgId         String
+ 
+
   title         String
   imageId       String
   imageThumbUrl String @db.Text
@@ -19,11 +56,15 @@ model Board {
   imageLinkHTML String @db.Text
   completed     Boolean @default(false)
 
+ 
+
   lists         List[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+
 
 model List {
   id        String @id @default(uuid())
@@ -51,6 +92,7 @@ model Card {
   list        List        @relation(fields: [listId], references: [id], onDelete: Cascade)
 
   comments    Comment[]   @relation("CardToComments")
+  files       File[]      @relation("CardToFile")
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -62,15 +104,30 @@ model Comment {
   id          String      @id @default(uuid())
   comment     String
   cardId      String      // Add a field to store the ID of the card associated with this comment
-  card        Card        @relation("CardToComments", fields: [cardId], references: [id])
+  card        Card        @relation("CardToComments", fields: [cardId], references: [id], onDelete: Cascade)
   
   userId      String
   userImage   String @db.Text
   userName    String @db.Text
+  userRole    String 
 
   createdAt   DateTime    @default(now())
   updatedAt   DateTime?   @updatedAt
 }
+
+model File{
+  id          String      @id @default(uuid())
+  userId      String
+  fileName    String       
+  downloadUrl String
+  cardId      String
+  card        Card        @relation("CardToFile", fields: [cardId], references: [id],  onDelete: Cascade)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
+}
+
+
 
 enum ACTION {
   CREATE

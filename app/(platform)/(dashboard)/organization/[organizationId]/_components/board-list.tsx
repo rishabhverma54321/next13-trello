@@ -20,6 +20,7 @@ import { fetcher } from "@/lib/fetcher";
 
 export const BoardList = async () => {
   const { orgId, orgRole } = auth();
+
   if (!orgId) {
     return redirect("/select-org");
   }

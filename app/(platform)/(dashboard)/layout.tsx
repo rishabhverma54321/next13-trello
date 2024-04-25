@@ -29,7 +29,7 @@ const DashboardLayout = async ({
     }
   });
 
-  // console.log(boards)
+  // // console.log(boards)
 
   return (
     <div className="h-full">
