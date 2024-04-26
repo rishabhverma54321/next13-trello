@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth, useOrganizationList, useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import { HelpCircle, User2, CheckCircle} from "lucide-react";
+import { HelpCircle, User2, CheckCircle } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { Hint } from "@/components/hint";
@@ -11,15 +11,21 @@ import { MAX_FREE_BOARDS } from "@/constants/boards";
 import { getAvailableCount } from "@/lib/org-limit";
 import { checkSubscription } from "@/lib/subscription";
 import Modal from "./BoardStatusModal";
+import { useToast } from "@/components/ui/use-toast"
+
+import { toast } from "sonner";
 
 
 import { useEffect, useState } from "react";
 import { Board } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
+import { space } from "postcss/lib/list";
+import BoardTile from "./BoardTile";
 
 export const BoardList = async () => {
-  const { orgId, orgRole } = auth();
+  const { orgId, orgRole, userId } = auth();
+
 
   if (!orgId) {
     return redirect("/select-org");
@@ -37,7 +43,7 @@ export const BoardList = async () => {
   });
 
 
-  const Completedboards = await db.board.findMany({
+  const completedboards = await db.board.findMany({
     where: {
       orgId,
       completed: true
@@ -47,19 +53,52 @@ export const BoardList = async () => {
     }
   });
 
+  const orgIds: string[] = [];
+
+  boards.forEach((obj) => {
+    orgIds.push(obj.orgId);
+
+  })
+
+  // Query the organization along with its associated users
+  const usersInOrganization = await db.user.findMany({
+    where: {
+      organizations: {
+        some: {
+          orgId: {
+            in: orgIds, // Use the 'in' filter to match against an array of values
+          }
+        }
+      }
+    }
+  });
 
 
+  let allowedmember = await db.boardusers.findMany({
+    where: {
+      userId: userId,
+
+    }
+  })
+
+  let allowedBoardIds = allowedmember.map((mem) => {
+    return mem.boardId;
+  })
+
+  console.log("Allowed user ", allowedmember)
+
+  // console.log(usersInOrganization)
   // const { data } = useQuery<Board[]>({
   //   queryKey: ["Notification-logs"],
   //   queryFn: () => fetcher(`/api/BoardCompleted/AllBoards`),
-  //   refetchInterval: 2000
+  //   refetchInterval: 2000  
 
   // });
 
 
   // const { data:completedProjects } = useQuery<Board[]>({
   //   queryKey: ["Notification-logs"],
-  //   queryFn: () => fetcher(`/api/BoardCompleted/CompletedBoards`),
+  //   queryFn: () => fetcher(`/api/BoardCompleted/completedBoards`),
   //   refetchInterval: 2000
 
   // });
@@ -70,6 +109,9 @@ export const BoardList = async () => {
   const availableCount = await getAvailableCount();
   const isPro = await checkSubscription();
 
+  const handleboard = () => {
+    console.log("unautorized")
+  }
 
 
   return (
@@ -84,46 +126,81 @@ export const BoardList = async () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {boards.map((board, boardId) => (
-            <div key={boardId} className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
-              {/* {(orgRole === 'org:admin') ? <input style = {{height:'20px'}}  type="checkbox" onChange={HandleCheckbox}></input> : null} */}
+          {boards.map((board, boardId) => {
+
+
+            return (
+              <div key={boardId} className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
+                {/* {(orgRole === 'org:admin') ? <input style = {{height:'20px'}}  type="checkbox" onChange={HandleCheckbox}></input> : null} */}
 
 
 
-              <div className="absolute pointer-events-none inset-0 bg-black/30 group-hover:bg-black/40 transition" />
+                <div className="absolute pointer-events-none inset-0 bg-black/30 group-hover:bg-black/40 transition" />
 
-              {/* <div className="flex flex-row "> */}
+                {/* <div className="flex flex-row "> */}
 
-              <Link
-                key={board.id}
-                href={`/board/${board.id}`}
-                className=""
-                style={{ height: "100%", width: "100%" }}
-              >
+                {allowedBoardIds.includes(board.id) ? (<Link
+                  key={board.id}
+                  href={`/board/${board.id}`}
+                  className=""
+                  style={{ height: "100%", width: "100%" }}
+                >
 
-              </Link>
-              <div className="flex flex-row justify-between absolute top-1 w-full">
-                <p className="relative font-semibold text-white">
-                  {board.title}
-                </p>
 
-                <p className="mr-3">
 
-                  {(orgRole === 'org:admin') ? (<p><Modal boardId={board.id} /></p>) : null}
+                </Link>) : (
 
-                </p>
+                  <>
 
-              </div>
-              {/* 
+
+                    {/* <Link
+                      key={board.id}
+
+                      href={`#`}
+                      className=""
+                      style={{ height: "100%", width: "100%" }}
+                    >
+
+                    </Link> */}
+
+                    {/* <button onClick={() => {toast.success("Aryaman CHu't h")}}>
+                      hello
+                    </button> */}
+
+                    <BoardTile />
+
+
+
+                  </>
+
+
+
+                )}
+
+
+                <div className="flex flex-row justify-between absolute top-1 w-full">
+                  <p className="relative font-semibold text-white">
+                    {board.title}
+                  </p>
+
+                  <p className="mr-3" style={{position: "absolute", zIndex: 999, right: 4, top: 4}}>
+
+                    {(orgRole === 'org:admin') ? (<p><Modal member={usersInOrganization} boardId={board.id} /></p>) : null}
+
+                  </p>
+
+                </div>
+                {/* 
                 <p className="">
 
                   {(orgRole === 'org:admin') ? (<p><Modal boardId={board.id} /></p>) : null}
 
                 </p> */}
 
-              {/* </div> */}
-            </div>
-          ))}
+                {/* </div> */}
+              </div>
+            )
+          })}
 
           <FormPopover sideOffset={10} side="right">
             <div
@@ -152,7 +229,7 @@ export const BoardList = async () => {
         </div>
       </div>
 
-      {Completedboards ? (
+      {completedboards ? (
 
 
         <>
@@ -165,7 +242,7 @@ export const BoardList = async () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Completedboards.map((board, boardId) => (
+            {completedboards.map((board, boardId) => (
 
               <div key={boardId} className="group relative aspect-video bg-no-repeat bg-center bg-cover rounded-sm h-full w-full p-2 overflow-hidden" style={{ backgroundImage: `url(${board.imageThumbUrl})`, display: "flex", flexDirection: "column", alignItems: "start" }}>
                 {/* {(orgRole === 'org:admin') ? <input style = {{height:'20px'}}  type="checkbox" onChange={HandleCheckbox}></input> : null} */}

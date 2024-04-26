@@ -56,6 +56,7 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   if(eventType === "user.created"){
+    console.log(body)
 
     const userData = JSON.parse(body)
     console.log(userData.data.email_addresses)
@@ -133,24 +134,7 @@ export async function POST(req: Request) {
     }
 
 
-    const organizationId = "org_2fY9hdJufIneQgIkvMydrPiixT2";
-
-// Query the organization along with its associated users
-const organizationWithUsers = await db.organization.findUnique({
-  where: {
-    id: organizationId
-  },
-  include: {
-    users: true // Include the associated users
-  }
-});
-
-if (organizationWithUsers) {
-  const numberOfUsers = organizationWithUsers.users.length;
-  console.log(`Number of users associated with organization ${organizationId}: ${numberOfUsers}`);
-} else {
-  console.error(`Organization with ID ${organizationId} not found.`);
-}
+ 
 
 
   }
