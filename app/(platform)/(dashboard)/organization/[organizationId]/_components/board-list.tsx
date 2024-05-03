@@ -25,6 +25,7 @@ import BoardTile from "./BoardTile";
 
 export const BoardList = async () => {
   const { orgId, orgRole, userId } = auth();
+  
 
 
   if (!orgId) {
@@ -81,11 +82,22 @@ export const BoardList = async () => {
     }
   })
 
+  let allowedboard = await db.boardusers.findMany({
+    where: {
+      boardId: "70a24e9e-c62f-408e-a88c-057e8ba2bb6c",
+
+    }
+  })
+
+  // console.log("Allowed members in board", allowedmember)
+  // console.log("Allowed Board", allowedboard)
+  
+
   let allowedBoardIds = allowedmember.map((mem) => {
     return mem.boardId;
   })
 
-  console.log("Allowed user ", allowedmember)
+  // console.log("Allowed user ", allowedmember)
 
   // console.log(usersInOrganization)
   // const { data } = useQuery<Board[]>({

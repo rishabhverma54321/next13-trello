@@ -38,10 +38,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     const existingAssociation = await db.boardusers.findFirst({
       where: {
         boardId: boardId,
-        userId: userId,
+        userId: userID,
       },
     });
 
+
+    console.log("existing user", existingAssociation)
     if (existingAssociation) {
       return{
         error:"User Already exist"
@@ -59,6 +61,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
       },
     });
+
+
+    console.log("User Id", userId)
   }
 
 
@@ -70,7 +75,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     }
   }
   
-  // revalidatePath(`/board/${boardId}`);
+  revalidatePath(`/organization/${orgId}`);
   return { data: addmember};
 };
 

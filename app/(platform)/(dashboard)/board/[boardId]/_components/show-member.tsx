@@ -1,24 +1,23 @@
 "use client"
 import { useAction } from '@/hooks/use-action';
 import { db } from '@/lib/db';
-import { button, user } from '@nextui-org/react';
+import { user } from '@nextui-org/react';
 import { Organization, User } from '@prisma/client';
 
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { useQueryClient } from "@tanstack/react-query";
-import { addMember } from '@/actions/add-boardmember';
+import { RemoveMember } from '@/actions/remove-member/schema';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
+import { removeMember } from '@/actions/remove-member';
 
-interface AddMembersData {
+interface Memberdata {
     membersData: any,
     boardId: string,
     setShowModel: Function
-  
-    
 }
 
-const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => {
+export const ShowMember =  ({ membersData, boardId, setShowModel }: Memberdata) => {
 
     const queryClient = useQueryClient();
 
@@ -28,7 +27,7 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
 
 
 
-    const { execute, fieldErrors } = useAction(addMember, {
+    const { execute, fieldErrors } = useAction(removeMember, {
         onSuccess: (result) => {
             queryClient.invalidateQueries({
                 queryKey: ["board", result.boardId],
@@ -36,7 +35,7 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
             queryClient.invalidateQueries({
                 queryKey: ["users", result.userId]
             });
-            toast.success(`User added`);
+            toast.success(`User removed`);
             disableAdding();
         },
         onError: (error) => {
@@ -55,11 +54,11 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
 
         execute({
             userID: userId,
-            boardId: boardId
+            id: boardId
 
         })
 
-        console.log("User Added")
+        console.log("User removed")
 
     }
 
@@ -71,7 +70,7 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
                 <div className='flex flex-row justify-between'>
                 <div className="text-left ">
                     <h3 className="text-2xl font-bold text-gray-900">Members</h3>
-                    <p className="text-lg text-black-500">View members and manage project</p>
+                    {/* <p className="text-lg text-black-500">View members and manage project</p> */}
                 </div>
 
                 <div >
@@ -95,8 +94,8 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
 
                                         <div className=" flex flex-col gap-y-1 ">
 
-                                            <span style={{ fontSize: 16 }} className="font-medium">{users.name}</span>
-                                            <span style={{ fontSize: 12 }} className="font-medium">{users.email}</span>
+                                            <span style={{ fontSize: 16 }} className="font-xl font-bold text-black">{users.name}</span>
+                                            <span style={{ fontSize: 12 }} className="font-xl  text-black">{users.email}</span>
 
                                         </div>
                                     </div>
@@ -104,10 +103,8 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
 
                                     <div className='justify-end'> {/* Moved the button here */}
 
-                                    
-
-                                        <button onClick={() => handleAddToProject(users.id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                            Add To Project
+                                        <button onClick={() => handleAddToProject(users.id)} className="bg-rose-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                            Remove from Project
                                         </button>
 
                                     </div>
@@ -124,4 +121,3 @@ const AddMembers =  ({ membersData, boardId, setShowModel }: AddMembersData) => 
     )
 }
 
-export default AddMembers

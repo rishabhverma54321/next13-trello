@@ -13,22 +13,41 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import AddMembers from "../../../organization/[organizationId]/_components/AddMembers";
+import { useState } from "react";
+import { Boardusers } from "@prisma/client";
+
+import { ShowMember } from "./show-member";
+
 interface BoardOptionsProps {
   id: string;
+  memberData: Boardusers
 };
 
-export const BoardOptions = ({ id }: BoardOptionsProps) => {
+export const BoardOptions = ({ id, memberData}: BoardOptionsProps) => {
+
   const { execute, isLoading } = useAction(deleteBoard, {
     onError: (error) => {
       toast.error(error);
     }
   });
 
+  const [showmodal, setShowModel] = useState(false);
+  const [button, setbutton] = useState(false);
+
+
   const onDelete = () => {
     execute({ id });
   };
 
+  const addMember = ()=>{
+    setShowModel(true)
+    setbutton(true)
+  }
+
   return (
+    <>
+    <div>
     <Popover>
       <PopoverTrigger asChild>
         <Button className="h-auto w-auto p-2" variant="transparent">
@@ -59,7 +78,19 @@ export const BoardOptions = ({ id }: BoardOptionsProps) => {
         >
           Delete this board
         </Button>
+        <Button
+          variant="ghost"
+          onClick={addMember}
+          disabled={isLoading}
+          className="rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm"
+        >
+          Show Members
+        </Button>
       </PopoverContent>
     </Popover>
+   
+    {showmodal?(<ShowMember  membersData ={memberData} boardId={id} setShowModel={setShowModel} />):null}
+    </div>
+    </>
   );
 };

@@ -102,7 +102,7 @@ function Modal({ member, boardId }: propsData) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-      {showmodal?(<AddMembers membersData ={member} boardId={boardId} setShowModel={setShowModel}/>):null}
+      {showmodal?(<AddMembers membersData ={member} boardId={boardId} setShowModel={setShowModel} />):null}
       
         {checked ? (
           <div className="fixed z-50 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
