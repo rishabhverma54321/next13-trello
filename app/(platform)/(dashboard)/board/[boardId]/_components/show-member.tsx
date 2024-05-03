@@ -29,12 +29,12 @@ export const ShowMember =  ({ membersData, boardId, setShowModel }: Memberdata) 
 
     const { execute, fieldErrors } = useAction(removeMember, {
         onSuccess: (result) => {
-            queryClient.invalidateQueries({
-                queryKey: ["board", result.boardId],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ["users", result.userId]
-            });
+            // queryClient.invalidateQueries({
+            //     queryKey: ["board", result.boardId],
+            // });
+            // queryClient.invalidateQueries({
+            //     queryKey: ["users", result.userId]
+            // });
             toast.success(`User removed`);
             disableAdding();
         },
