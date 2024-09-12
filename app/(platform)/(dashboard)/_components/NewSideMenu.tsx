@@ -13,7 +13,7 @@ interface LocalBoard {
 }
 
 export const NewSideMenu = ({ data }: LocalBoard) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen); // Toggle the state of isOpen
@@ -23,11 +23,11 @@ export const NewSideMenu = ({ data }: LocalBoard) => {
     <div className="flex items-end">
       <Button
         onClick={toggleMenu}
-        className="z-50 fixed top-10 mt-7"
-        variant="ghost"
+        className="z-50 fixed top-10 mt-7 ml-1 bg-transparent"
+        
         size="sm"
-      >
-        <Menu className="h-4 w-4" />
+       >
+        <Menu className="h-4 w-4" color="#e5e7eb"/>
       </Button>
 
       {isOpen && ( // Render the side menu only if isOpen is true
@@ -94,7 +94,7 @@ export const NewSideMenu = ({ data }: LocalBoard) => {
               paddingLeft: "20px",
             }}
           >
-            <h3 className="text-xl font-semibold">Your Boards</h3>
+            <h3 className="text-xl font-semibold">Your Projects</h3>
             {/* Board list */}
             {data.map((board, i) => (
               <div key={i}>

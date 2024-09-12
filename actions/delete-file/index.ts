@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/create-safe-action";
 
-import { DeleteComment } from "./schema";
+import { DeleteFile } from "./schema";
 import { InputType, ReturnType } from "./types";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
@@ -23,26 +23,19 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { id, userid } = data;
+  const { id, userID } = data;
   let comment;
 
-  if(userid===userId || orgRole==="org:admin"){
-
+if(userID===userId){  
     try {
-      comment = await db.comment.delete({
+      comment = await db.file.delete({
         where: {
           id,
         
         },
       });
   
-      await createAuditLog({
-        entityTitle: comment.comment,
-        entityId: comment.id,
-        entityType: ENTITY_TYPE.COMMENT,
-        action: ACTION.DELETE,
-        userId:userId
-      })
+  
     } catch (error) {
       return {
         error: "Failed to delete."
@@ -51,15 +44,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   
     revalidatePath(`/board/${id}`);
     return { data: comment };
+  }else{
 
-  }
-  else{
     return{
-      error:"You are unauthorized to delete this comment"
+      error : "You are not allowed to delete this file"
     }
   }
-
   
 };
 
-export const deleteComment = createSafeAction(DeleteComment, handler);
+export const deleteFile = createSafeAction(DeleteFile, handler);

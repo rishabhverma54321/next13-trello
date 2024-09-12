@@ -29,13 +29,13 @@ export async function POST(request: Request) {
             data: { isRead: true },
         });
 
-        console.log("Item pressed")
+        // console.log("Item pressed")
 
         return new NextResponse(""); 
   
 
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      // console.error("Error marking notification as read:", error);
       return new NextResponse("Internal Error", { status: 500 });
     }
   }

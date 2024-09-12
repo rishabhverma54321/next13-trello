@@ -65,6 +65,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       }
     });
 
+    await db.boardusers.create({
+      data:{
+        boardId:board.id,
+        userId:userId
+      }
+    })
+
     if (!isPro) {
      await incrementAvailableCount();
     }
